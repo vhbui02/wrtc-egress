@@ -33,7 +33,7 @@ export class WHEPEndpoint extends BaseAdapter {
     channel.addViewer(viewer);
   }
 
-  removeViewerFromChannel(channelId: string, viewer: WhepViewer) {
+  removeViewerFromChannel(channelId: string, viewer: Viewer) {
     const channel = this.channelManager.getChannel(channelId);
     if (!channel) {
       this.error(`Channel ${channelId} not found`);

@@ -18,6 +18,7 @@ export interface MediaStreamsInfo {
     ssrcs: MediaStreamsInfoSsrc[];
     ssrcGroups: MediaStreamsInfoSsrcGroup[];
     codec?: string;
+    parameters?: Record<string, string>;
   }
 }
 
@@ -48,7 +49,8 @@ export const MediaStreamsSchema = {
       properties: {
         ssrcs: { type: "array", items: { type: "object", properties: MediaStreamsInfoSsrcSchema } },
         ssrcsGroups: { type: "array", items: { type: "object", properties: MediaStreamsInfoSsrcGroupSchema } },
-        codec: { type: "string" }
+        codec: { type: "string" },
+        parameters: { type: "object", additionalProperties: { type: "string" } }
       }
     }
   }

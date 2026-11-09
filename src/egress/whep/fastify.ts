@@ -24,6 +24,13 @@ type PatchRequest = FastifyRequest<{
   Body: string;
 }>;
 
+type DeleteRequest = FastifyRequest<{
+  Params: {
+    channelId: string;
+    viewerId: string;
+  };
+}>;
+
 type PostRequest = FastifyRequest<{
   Params: {
     channelId: string;
@@ -132,13 +139,45 @@ export default function (fastify: FastifyInstance, opts: any, done) {
       try {
         reply.headers({
           Accept: ["application/sdp"],
-          Allow: ["PATCH"],
+          Allow: ["PATCH", "DELETE"],
         });
         reply.code(204).send();
       } catch (e) {
         console.error(e);
         const err = new Error(
           "Exception thrown see server logs for more details",
+        );
+        reply.code(500).send(err.message);
+      }
+    },
+  );
+
+  fastify.delete(
+    "/channel/:channelId/:viewerId",
+    {},
+    async (request: DeleteRequest, reply: FastifyReply) => {
+      try {
+        const channelId = request.params.channelId;
+        const viewerId = request.params.viewerId;
+
+        console.log(`channelId ${channelId}, viewerId ${viewerId}`);
+
+        const viewer = adapter.getViewerForChannel(channelId, viewerId);
+        if (!viewer) {
+          console.warn(
+            `channelId ${channelId}, viewerId ${viewerId} not found`,
+          );
+          reply.code(200).send();
+          return;
+        }
+
+        adapter.removeViewerFromChannel(channelId, viewer);
+        viewer.destroy();
+        reply.code(200).send();
+      } catch (e) {
+        console.error(e);
+        const err = new Error(
+          "Exception thrown when deleting WHEP viewer resource",
         );
         reply.code(500).send(err.message);
       }

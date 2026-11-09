@@ -68,7 +68,12 @@ export class BaseViewer extends EventEmitter {
         id: 96,
         clockrate: 90000,
         name: "H264",
-        parameters: {},
+        parameters: {
+          'packetization-mode': '1',
+          'level-asymmetry-allowed': '1',
+          'profile-level-id': '42e01f',
+          ...this.mediaStreams.video.parameters
+        },
         'rtcp-fbs': [
           { type: 'goog-remb', subtype: undefined },
           { type: 'nack', subtype: undefined },
@@ -274,6 +279,14 @@ export class BaseViewer extends EventEmitter {
             .join(';')
         });
       }
+
+      payloadType["rtcp-fbs"].forEach(rtcpFb => {
+        videoDescription.rtcpFb.push({
+          payload: payloadType.id,
+          type: rtcpFb.type,
+          subtype: rtcpFb.subtype
+        });
+      });
     });
 
     videoDescription.ext = video["rtp-hdrexts"].flatMap(element => {
